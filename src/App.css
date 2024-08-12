@@ -1,0 +1,148 @@
+.App {
+  text-align: center;
+  height: 100vh;
+  background-color: #000000;
+  font-family: 'Lato, sans-serif';
+}
+
+@media (max-width: 600px) {
+  .App {
+    height: auto;
+    height: 100dvh; /* Ensure minimum height covers viewport */
+    background-color: #000000;
+  }
+}
+
+/* Form.css */
+.datepicker-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 496px;
+  height: 450px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.datepicker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.datepicker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+}
+
+.day.selected {
+  background-color: #e3418b;
+  color: white;
+}
+
+.day.empty {
+  visibility: hidden;
+}
+
+.day:hover {
+  background-color: #e0e0e0; /* Light grey background on hover */
+}
+
+.datepicker-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.timepicker-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  background: white;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.timepicker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.timepicker-body {
+  display: flex;
+  justify-content: space-between;
+}
+
+.timepicker-hours,
+.timepicker-minutes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.time-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
+}
+
+.time-item.selected {
+  background-color: #e3418b;
+  color: white;
+}
+
+.time-item:hover {
+  background-color: #e0e0e0;
+}
+
+.timepicker-footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+/* styles.css */
+::-webkit-scrollbar {
+  width: 6px; /* Adjust the width as needed */
+}
+
+::-webkit-scrollbar-track {
+  background: #1e1e1e; /* Background color of the scrollbar track */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #e3418b; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Roundness of the scrollbar thumb */
+  cursor: pointer;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #c32c71; /* Color when hovering over the scrollbar thumb */
+}
