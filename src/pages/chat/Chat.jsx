@@ -1,50 +1,102 @@
-import { Box, Button, Typography, useMediaQuery } from '@mui/material'
 import React, { useEffect, useState } from 'react'
+import { Box, Button, Typography, useMediaQuery } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
+import axios from 'axios'
 import CustomIcon from '../../custom_components/CustomIcon'
 import zap from '../../resources/svg/zap.svg'
 import LogoTitle from '../login/LogoTitle'
 import { flexStyles } from '../../resources/typography/flexStyles'
 import SideList from './SideList'
-import kundli from '../../resources/svg/kundli.svg'
-import mask from '../../resources/svg/mask.svg'
 import crown from '../../resources/svg/crownBlackBorder.svg'
 import Profile from './Profile'
 import Questions from './Questions'
 import History from './History'
 import PersonalProfile from './PersonalProfile'
-import { useLocation, useNavigate } from 'react-router-dom'
 import { themeColors } from '../../resources/typography/colors'
 import astroIcon from '../../resources/svg/astroIcon.svg'
-
+ 
 const Chat = () => {
   const [selectedIndex, setSelectedIndex] = useState(0)
+  const [inputValue, setInputValue] = useState('') // State for the input field
+  const [chatMessages, setChatMessages] = useState([]) // State for chat messages
   const navigate = useNavigate()
   const mobile = useMediaQuery((theme) => theme.breakpoints.down('sm'))
-
+  const [userDetailData, setUserDetailData] = useState(null)
+  const [loading, setLoading] = useState(false)
+ 
   const location = useLocation()
-
+ 
   const storedUserDetails = localStorage.getItem('userDetails')
   const userDetails = storedUserDetails ? JSON.parse(storedUserDetails) : null
-
-  const svgImage = userDetails.svg.replace(/\\"/g, '"')
+ 
+  const svgImage = userDetails?.svg?.replace(/\\"/g, '"')
   const dataUrl = `data:image/svg+xml;charset=UTF-8,${svgImage}`
-
-  console.log(dataUrl, 'aljlkd')
-
-  console.log(selectedIndex, 'asknfkjsdn')
-
+ 
   useEffect(() => {
     const urlParams = new URLSearchParams(location.search)
     const authToken = urlParams.get('authToken')
-
+ 
     if (authToken) {
       localStorage.setItem('authToken', authToken)
+      const fetchData = async () => {
+        try {
+          const authToken = localStorage.getItem('authToken')
+          const response = await axios.get(
+            'https://mooladhara-backend.adaptable.app/api/users/getUser',
+            {
+              headers: {
+                Authorization: authToken,
+                'Content-Type': 'application/json',
+              },
+            }
+          )
+          localStorage.setItem('userDetails', JSON.stringify(response.data))
+          setUserDetailData(response.data)
+        } catch (error) {
+          console.error('Failed to fetch user details:', error)
+        }
+      }
+      fetchData()
     }
-
+ 
     // Navigate to '/update-details'
     navigate('/chat')
   }, [location.search])
-
+ 
+  // Handler function to update the input field
+  const handleQuestionClick = (question) => {
+    setInputValue(question)
+  }
+ 
+  const handleAsk = async () => {
+    try {
+      const authToken = localStorage.getItem('authToken')
+      const response = await axios.post(
+        'https://mooladhara-backend.adaptable.app/api/chat/create',
+        {
+          question: inputValue,
+        },
+        {
+          headers: {
+            Authorization: authToken,
+            'Content-Type': 'application/json',
+          },
+        }
+      )
+ 
+      // Update chat messages state with the question and answer
+      setChatMessages([
+        ...chatMessages,
+        { question: response.data.question, answer: response.data.answer },
+      ])
+ 
+      // Clear input field after sending the question
+      setInputValue('')
+    } catch (error) {
+      console.error('Error creating user:', error)
+    }
+  }
+ 
   return (
     <Box
       sx={{
@@ -54,55 +106,57 @@ const Chat = () => {
       }}
     >
       {/* Left Side Panel */}
-      <Box
-        sx={{
-          width: '35%',
-          ...flexStyles.flexColumn,
-          p: '40px',
-          overflowY: 'auto', // Enable vertical scrolling
-          '&::-webkit-scrollbar': {
-            width: '0px',
-            height: '0px',
-          },
-          '-ms-overflow-style': 'none',
-          'scrollbar-width': 'none',
-        }}
-      >
-        <Box sx={{ ...flexStyles.flexCenterSpaceBetween }}>
-          <LogoTitle />
-          <Box
-            sx={{
-              ...flexStyles.flexRowAlignCenter,
-              height: '32px',
-              p: '8px 12px',
-              gap: '8px',
-              backgroundColor: '#1C1C1C',
-              borderRadius: '34px',
-            }}
-          >
-            <CustomIcon src={zap} width={18} height={18} />{' '}
-            <Typography variant='body4' sx={{ color: '#FFFFFF' }}>
-              0
-            </Typography>
-          </Box>
-        </Box>
-        <Box sx={{ mt: '56px' }}>
-          <SideList
-            selectedIndex={selectedIndex}
-            setSelectedIndex={setSelectedIndex}
-          />
-        </Box>
+      {!mobile && (
         <Box
           sx={{
-            mt: '56px',
-            height: '258px',
-            backgroundColor: 'white',
+            width: '35%',
+            ...flexStyles.flexColumn,
+            p: '40px',
+            overflowY: 'auto',
+            '&::-webkit-scrollbar': {
+              width: '0px',
+              height: '0px',
+            },
+            '-ms-overflow-style': 'none',
+            'scrollbar-width': 'none',
           }}
         >
-          <img src={dataUrl} width='100%' height='100%' alt='kundli' />
+          <Box sx={{ ...flexStyles.flexCenterSpaceBetween }}>
+            <LogoTitle />
+            <Box
+              sx={{
+                ...flexStyles.flexRowAlignCenter,
+                height: '32px',
+                p: '8px 12px',
+                gap: '8px',
+                backgroundColor: '#1C1C1C',
+                borderRadius: '34px',
+              }}
+            >
+              <CustomIcon src={zap} width={18} height={18} />{' '}
+              <Typography variant='body4' sx={{ color: '#FFFFFF' }}>
+                0
+              </Typography>
+            </Box>
+          </Box>
+          <Box sx={{ mt: '56px' }}>
+            <SideList
+              selectedIndex={selectedIndex}
+              setSelectedIndex={setSelectedIndex}
+            />
+          </Box>
+          <Box
+            sx={{
+              mt: '56px',
+              height: '258px',
+              backgroundColor: 'white',
+            }}
+          >
+            <img src={dataUrl} width='100%' height='100%' alt='kundli' />
+          </Box>
         </Box>
-      </Box>
-
+      )}
+ 
       {/* Right Side Panel */}
       <Box
         sx={{
@@ -112,15 +166,6 @@ const Chat = () => {
           ...flexStyles.flexColumn,
         }}
       >
-        {/* {selectedIndex !== 3 && (
-          <Box>
-            <Profile
-              name={'Cillian Murphy'}
-              imageSrc={mask}
-              role={'AI Astrologer'}
-            />
-          </Box>
-        )} */}
         {selectedIndex === 0 && (
           <>
             <Box
@@ -133,7 +178,41 @@ const Chat = () => {
                 overflowY: 'auto', // Enable scrolling for Questions
               }}
             >
-              <Questions />
+              {chatMessages.length === 0 ? (
+                <Questions onQuestionClick={handleQuestionClick} />
+              ) : (
+                <Box>
+                  {chatMessages.map((message, index) => (
+                    <Box key={index} sx={{ mb: '15px' }}>
+                      <Typography
+                        variant='body1'
+                        sx={{
+                          textAlign: 'left',
+                          color: '#fff',
+                          backgroundColor: '#2e2e2e',
+                          p: '10px',
+                          borderRadius: '10px',
+                        }}
+                      >
+                        {message.question}
+                      </Typography>
+                      <Typography
+                        variant='body2'
+                        sx={{
+                          textAlign: 'left',
+                          color: '#fff',
+                          backgroundColor: '#4e4e4e',
+                          p: '10px',
+                          borderRadius: '10px',
+                          mt: '5px',
+                        }}
+                      >
+                        {message.answer}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              )}
             </Box>
             {/* Fixed height box visible in UI */}
             <Box
@@ -151,6 +230,8 @@ const Chat = () => {
               <input
                 type='text'
                 placeholder='Type here to ask anything'
+                value={inputValue} // Bind the input field to state
+                onChange={(e) => setInputValue(e.target.value)} // Update state on input change
                 style={{
                   height: '52px',
                   flex: 1,
@@ -173,7 +254,16 @@ const Chat = () => {
                     '&:hover': {
                       backgroundColor: '#E3418B', // Same hover color
                     },
+                    '&.Mui-disabled': {
+                      backgroundColor: '#828282',
+                      color: 'white',
+                      '& .MuiButton-endIcon': {
+                        color: 'white',
+                      },
+                    },
                   }}
+                  onClick={handleAsk}
+                  disabled={inputValue?.length === 0}
                 >
                   Ask
                 </Button>
@@ -190,16 +280,16 @@ const Chat = () => {
             </Box>
           </>
         )}
-
+ 
         {selectedIndex === 1 && <History />}
-
+ 
         {selectedIndex === 3 && <PersonalProfile />}
-
+ 
         {selectedIndex === 2 && (
           <Box
             sx={{
               p: '15px',
-              // width: mobile ? '100%' : '59%',
+              width: '100%',
               height: '100%',
               border: '1px solid white',
               borderRadius: '17px',
@@ -276,5 +366,7 @@ const Chat = () => {
     </Box>
   )
 }
-
+ 
 export default Chat
+ 
+ 

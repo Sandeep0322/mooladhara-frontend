@@ -15,12 +15,13 @@ import Chat from "./pages/chat/Chat";
 
 function PrivateRoute({ element }) {
   const authToken = localStorage.getItem("authToken");
+  const userDetails = localStorage.getItem("userDetails");
 
-  return authToken && authToken !== null ? (
-    element
-  ) : (
-    <Navigate to="/login" replace />
-  );
+  if (authToken && userDetails) {
+    return <Navigate to="/chat" replace />;
+  }
+
+  return authToken ? element : <Navigate to="/login" replace />;
 }
 
 function App() {
@@ -32,16 +33,15 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/update-details" element={<Details />} />
+            <Route path="/verify" element={<Verify />} />
+            <Route path="/birth-chart" element={<BirthChart />} />
             <Route
-              path="/verify"
-              element={<PrivateRoute element={<Verify />} />}
-            />
-            <Route
-              path="/birth-chart"
-              element={<PrivateRoute element={<BirthChart />} />}
+              path="/"
+              element={
+                <PrivateRoute element={<Navigate to="/chat" replace />} />
+              }
             />
             <Route path="/chat" element={<Chat />} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
           </Routes>
         </Box>
       </Router>

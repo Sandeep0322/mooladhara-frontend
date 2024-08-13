@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Typography,
@@ -6,176 +6,183 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Divider,
-} from '@mui/material'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import comment from '../../resources/svg/comment.svg'
-import CustomIcon from '../../custom_components/CustomIcon'
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import comment from "../../resources/svg/comment.svg";
+import CustomIcon from "../../custom_components/CustomIcon";
+import axios from "axios";
+import dayjs from "dayjs";
 
 const styles = {
   container: {
-    padding: '20px',
-    backgroundColor: '#1e1e1e',
-    borderRadius: '18px',
-    color: '#fff',
-    display: 'flex',
-    flexDirection: 'column',
+    padding: "20px",
+    backgroundColor: "#1e1e1e",
+    borderRadius: "18px",
+    color: "#fff",
+    display: "flex",
+    flexDirection: "column",
     flexGrow: 1,
-    overflowY: 'auto',
-    '&::-webkit-scrollbar': {
-      display: 'none',
+    overflowY: "auto",
+    "&::-webkit-scrollbar": {
+      display: "none",
     },
   },
-  gridContainer: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
   paper: {
-    padding: '20px',
-    backgroundColor: '#222222',
-    color: '#fff',
-    borderRadius: '10px',
-    marginBottom: '10px',
+    padding: "20px",
+    backgroundColor: "#222222",
+    color: "#fff",
+    borderRadius: "10px",
+    marginBottom: "10px",
   },
-}
-
-const data = [
-  {
-    date: '29 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer:
-          'With your steadfast and reliable nature, you excel in careers that require patience and perseverance. Your affinity for beauty and luxury might lead you to success in fields like finance, real estate, or the arts.',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
+  dateBox: {
+    textAlign: "left",
+    pb: "24px",
+    mt: "10px",
+    mb: "24px",
   },
-  {
-    date: '28 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
+  dateText: {
+    textAlign: "left",
+    marginBottom: "20px",
   },
-  {
-    date: '28 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
-  },
-  {
-    date: '28 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
-  },
-  {
-    date: '28 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
-  },
-  {
-    date: '28 Dec 2023',
-    questions: [
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-      {
-        question: 'What type of job suit me the best ?',
-        answer: '',
-      },
-    ],
-  },
-]
+};
 
 const History = () => {
+  const [histories, setHistories] = useState([]);
+  const [detailedAnswers, setDetailedAnswers] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [groupedHistories, setGroupedHistories] = useState({});
+  const [expanded, setExpanded] = useState(null); // Track the expanded accordion
+
+  useEffect(() => {
+    const fetchHistories = async () => {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const response = await axios.get(
+          "https://mooladhara-backend.adaptable.app/api/chat/all-histories",
+          {
+            headers: {
+              Authorization: authToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const historiesData = response.data;
+        setHistories(historiesData);
+
+        // Group histories by date
+        const grouped = historiesData.reduce((acc, item) => {
+          const dateKey = dayjs(item.createdAt).format("DD MMM YYYY");
+          if (!acc[dateKey]) {
+            acc[dateKey] = [];
+          }
+          acc[dateKey].push(item);
+          return acc;
+        }, {});
+
+        setGroupedHistories(grouped);
+      } catch (error) {
+        console.error("Failed to fetch histories:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHistories();
+  }, []);
+
+  const handleChange = async (panel) => {
+    if (expanded === panel) {
+      setExpanded(null); // Close the accordion if it's already expanded
+      return;
+    }
+
+    setExpanded(panel);
+
+    if (!detailedAnswers[panel]) {
+      try {
+        const authToken = localStorage.getItem("authToken");
+        const response = await axios.get(
+          `https://mooladhara-backend.adaptable.app/api/chat/history/${panel}`,
+          {
+            headers: {
+              Authorization: authToken,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        setDetailedAnswers((prev) => ({
+          ...prev,
+          [panel]: response.data,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch detailed answer:", error);
+      }
+    }
+  };
+
   return (
     <Box sx={styles.container}>
-      {data.map((day, index) => (
-        <div key={index}>
-          <Box sx={{ textAlign: 'left', pb: '24px', mt: '10px' }}>
-            <Typography variant='body12'>{day.date}</Typography>
-          </Box>
-
-          {day.questions.map((item, idx) => (
-            <Paper key={idx} sx={styles.paper}>
-              <Accordion sx={{ backgroundColor: '#222222' }}>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon sx={{ color: '#FFFFFF' }} />}
-                  aria-controls={`panel${index}-${idx}-content`}
-                  id={`panel${index}-${idx}-header`}
+      {loading ? (
+        <Typography variant="body1" sx={{ color: "#FFFFFF" }}>
+          Loading...
+        </Typography>
+      ) : (
+        Object.keys(groupedHistories).map((dateKey) => (
+          <Box key={dateKey} sx={styles.dateBox}>
+            <Typography variant="body12" sx={styles.dateText}>
+              {dateKey}
+            </Typography>
+            {groupedHistories[dateKey].map((item) => (
+              <Paper key={item._id} sx={styles.paper}>
+                <Accordion
+                  sx={{ backgroundColor: "#222222" }}
+                  expanded={expanded === item._id}
+                  onChange={() => handleChange(item._id)}
                 >
-                  <Box
-                    sx={{
-                      width: '100%',
-                      display: 'flex',
-                    }}
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon sx={{ color: "#FFFFFF" }} />}
+                    aria-controls={`panel${item._id}-content`}
+                    id={`panel${item._id}-header`}
                   >
-                    <CustomIcon src={comment} width={22} height={22} />{' '}
-                    <Typography
-                      variant='body1'
-                      sx={{ textAlign: 'left', color: '#FFFFFF', ml: '16px' }}
+                    <Box
+                      sx={{
+                        width: "100%",
+                        display: "flex",
+                      }}
                     >
-                      {item.question}
-                    </Typography>
-                  </Box>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <>
-                    <Typography
-                      variant='body1'
-                      sx={{ textAlign: 'left', color: '#FFFFFF' }}
-                    >
-                      Answer :
-                    </Typography>
-                    <Typography
-                      variant='body1'
-                      sx={{ mt: '16px', textAlign: 'left', color: '#FFFFFF' }}
-                    >
-                      {item.answer || 'N/A'}
-                    </Typography>
-                  </>
-                </AccordionDetails>
-              </Accordion>
-            </Paper>
-          ))}
-        </div>
-      ))}
+                      <CustomIcon src={comment} width={22} height={22} />
+                      <Typography
+                        variant="body1"
+                        sx={{ textAlign: "left", color: "#FFFFFF", ml: "16px" }}
+                      >
+                        {item.history.question}
+                      </Typography>
+                    </Box>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <>
+                      <Typography
+                        variant="body1"
+                        sx={{ textAlign: "left", color: "#FFFFFF" }}
+                      >
+                        Answer :
+                      </Typography>
+                      <Typography
+                        variant="body1"
+                        sx={{ mt: "16px", textAlign: "left", color: "#FFFFFF" }}
+                      >
+                        {detailedAnswers[item._id]?.historyData}
+                      </Typography>
+                    </>
+                  </AccordionDetails>
+                </Accordion>
+              </Paper>
+            ))}
+          </Box>
+        ))
+      )}
     </Box>
-  )
-}
+  );
+};
 
-export default History
+export default History;
