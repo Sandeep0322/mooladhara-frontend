@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, Avatar, Button } from "@mui/material";
+import { Box, Typography, Avatar, Button, useMediaQuery } from "@mui/material";
 import CustomIcon from "../../custom_components/CustomIcon";
 import zap from "../../resources/svg/zap.svg";
 import kundli from "../../resources/svg/kundli.svg";
@@ -81,11 +81,12 @@ const HistorySection = ({ title, noDataMessage }) => (
 );
 
 const ProfileDetails = () => {
-  const navigate = useNavigate();
   const storedUserDetails = localStorage.getItem("userDetails");
   const userDetails = storedUserDetails ? JSON.parse(storedUserDetails) : null;
+  const mobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
+  const navigate = useNavigate();
 
-  const svgImage = userDetails.svg.replace(/\\"/g, '"');
+  const svgImage = userDetails?.svg?.replace(/\\"/g, '"');
   const dataUrl = `data:image/svg+xml;charset=UTF-8,${svgImage}`;
   const paymentHistory = []; // Add your payment history data here
   const subscriptionHistory = []; // Add your subscription history data here
@@ -160,7 +161,7 @@ const ProfileDetails = () => {
               mt: "12px",
             }}
           >
-            {`${formatDate(userDetails.user.dateOfBirth)} - ${
+            {`${formatDate(userDetails?.user?.dateOfBirth)} - ${
               userDetails?.user?.timeOfBirth
             }`}
           </Typography>
@@ -201,7 +202,7 @@ const ProfileDetails = () => {
             backgroundColor: "white",
           }}
         >
-          <img src={dataUrl} width="350px" height="350px" alt="kundli" />
+          <img src={dataUrl} width="320px" height="350px" alt="kundli" />
         </Box>
 
         <Button
@@ -221,6 +222,7 @@ const ProfileDetails = () => {
             mt: "40px",
             textTransform: "none",
             fontSize: "15px",
+            mb: mobile && "80px",
           }}
           onClick={logout}
         >

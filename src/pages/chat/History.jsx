@@ -129,9 +129,11 @@ const History = () => {
       ) : (
         Object.keys(groupedHistories).map((dateKey) => (
           <Box key={dateKey} sx={styles.dateBox}>
-            <Typography variant="body12" sx={styles.dateText}>
-              {dateKey}
-            </Typography>
+            <Box sx={{ mb: "20px" }}>
+              <Typography variant="body12" sx={styles.dateText}>
+                {dateKey}
+              </Typography>
+            </Box>
             {groupedHistories[dateKey].map((item) => (
               <Paper key={item._id} sx={styles.paper}>
                 <Accordion
