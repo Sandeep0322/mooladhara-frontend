@@ -116,8 +116,8 @@ const DetailsBox = ({ name }) => {
     console.log(userDetails, "akjndfkjab");
 
     // Replace USERID and APIKEY with your actual values
-    const userId = "632795";
-    const apiKey = "ef7dc13f592f4bb06dc47fdc97d2948ca49dda90";
+    const userId = "633179";
+    const apiKey = "5fd633449d18e2c21b1f0e3c0fd1de0a5267be2a";
 
     // Create the Authorization header value
     const auth = `${btoa(`${userId}:${apiKey}`)}`;
