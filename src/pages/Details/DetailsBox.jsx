@@ -148,6 +148,7 @@ const DetailsBox = ({ name }) => {
         birthPlace: selectedPlace.state,
       };
 
+      console.log(authToken);
       const response1 = await axios.put(
         "https://mooladhara-backend.adaptable.app/api/users/update",
         requestBody,
