@@ -143,7 +143,7 @@ const ProfileDetails = () => {
           flexDirection: "column",
         }}
       >
-        <Box sx={{ width: "100%", ...flexStyles.flexColumnCenter, mt: "48px" }}>
+        {/* <Box sx={{ width: "100%", ...flexStyles.flexColumnCenter, mt: "48px" }}>
           <CustomIcon src={scorpio} width={48} height={48} />
           <Typography
             variant={"body9"}
@@ -194,8 +194,8 @@ const ProfileDetails = () => {
               {leftSectionContent.sunSign}
             </Typography>
           </Box>
-        </Box>
-        <Box
+        </Box> */}
+        {/* <Box
           sx={{
             mt: "50px",
             width: "100%",
@@ -203,7 +203,7 @@ const ProfileDetails = () => {
           }}
         >
           <img src={dataUrl} width="320px" height="350px" alt="kundli" />
-        </Box>
+        </Box> */}
 
         <Button
           variant="contained"
@@ -227,6 +227,30 @@ const ProfileDetails = () => {
           onClick={logout}
         >
           Logout
+        </Button>
+
+        <Button
+          variant="contained"
+          sx={{
+            backgroundColor: themeColors.palette.customColor.main,
+            color: "white",
+            "&:hover": {
+              backgroundColor: themeColors.palette.customColor.main,
+            },
+            "& .MuiButton-endIcon": {
+              color: "white",
+            },
+            height: "38px",
+            width: "98px",
+            borderRadius: "41px",
+            mt: "40px",
+            textTransform: "none",
+            fontSize: "15px",
+            mb: mobile && "80px",
+          }}
+          onClick={logout}
+        >
+          Delete
         </Button>
       </Box>
     </>

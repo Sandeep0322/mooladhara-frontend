@@ -9,17 +9,21 @@ import { localeKeys } from "../../resources/typography/localeKeys";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { formatDate, getDayOfWeek } from "../utils";
+import Lottie from "react-lottie";
+import animationData from "../Animation - 1727541929573.json"; // path to your lottie file
 
 const Verify = () => {
   const mobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const navigate = useNavigate();
   const [userDetails, setUserDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   console.log(userDetails, "kskajndckjs");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoading(true);
         const authToken = localStorage.getItem("authToken");
         const response = await axios.get(
           "https://mooladhara-backend.adaptable.app/api/users/getUser",
@@ -36,6 +40,7 @@ const Verify = () => {
         console.error("Failed to fetch user details:", error);
       }
     };
+    setLoading(false);
     fetchData();
   }, []);
 
@@ -198,6 +203,44 @@ const Verify = () => {
             {localeKeys.saveAndContinue}
           </Button>
         </Box>
+        {loading && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: "rgba(83, 104, 100, 0.403)",
+              zIndex: 9999,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Lottie
+                options={{
+                  loop: true,
+                  autoplay: true,
+                  animationData: animationData,
+                  rendererSettings: {
+                    preserveAspectRatio: "xMidYMid slice",
+                  },
+                }}
+                height={150}
+                width={150}
+              />
+            </div>
+          </div>
+        )}
       </Box>
     </HeaderBox>
   );

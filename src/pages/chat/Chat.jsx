@@ -15,6 +15,8 @@ import PersonalProfile from "./PersonalProfile";
 import { themeColors } from "../../resources/typography/colors";
 import astroIcon from "../../resources/svg/astroIcon.svg";
 import FloatingIcons from "./FloatingIcons";
+import Lottie from "react-lottie";
+import animationData from "../Animation - 1727541929573.json"; // path to your lottie file
 
 const Chat = () => {
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -40,6 +42,7 @@ const Chat = () => {
     if (authToken) {
       localStorage.setItem("authToken", authToken);
     } else {
+      setLoading(true);
       const fetchData = async () => {
         try {
           const authToken = localStorage.getItem("authToken");
@@ -58,6 +61,7 @@ const Chat = () => {
           console.error("Failed to fetch user details:", error);
         }
       };
+      setLoading(false);
       fetchData();
     }
 
@@ -72,6 +76,7 @@ const Chat = () => {
 
   const handleAsk = async () => {
     try {
+      setLoading(true);
       const authToken = localStorage.getItem("authToken");
       const response = await axios.post(
         "https://mooladhara-backend.adaptable.app/api/chat/create",
@@ -85,6 +90,7 @@ const Chat = () => {
           },
         }
       );
+      setLoading(false);
 
       // Update chat messages state with the question and answer
       setChatMessages([
@@ -279,6 +285,45 @@ const Chat = () => {
                 >
                   <CustomIcon src={crown} width={20} height={20} />
                 </Box>
+
+                {loading && (
+                  <div
+                    style={{
+                      position: "fixed",
+                      top: 0,
+                      left: 0,
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      backgroundColor: "rgba(83, 104, 100, 0.403)",
+                      zIndex: 9999,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Lottie
+                        options={{
+                          loop: true,
+                          autoplay: true,
+                          animationData: animationData,
+                          rendererSettings: {
+                            preserveAspectRatio: "xMidYMid slice",
+                          },
+                        }}
+                        height={150}
+                        width={150}
+                      />
+                    </div>
+                  </div>
+                )}
               </Box>
             </Box>
           </>

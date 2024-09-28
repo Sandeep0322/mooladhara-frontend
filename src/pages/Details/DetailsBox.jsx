@@ -18,6 +18,8 @@ import calendar from "../../resources/svg/calendar.svg";
 import clock from "../../resources/svg/clock.svg";
 import { useLocation, useNavigate } from "react-router-dom";
 import { statesCoordinates } from "../states";
+import Lottie from "react-lottie";
+import animationData from "../Animation - 1727541929573.json"; // path to your lottie file
 
 const genders = [
   { id: "male", label: "Male" },
@@ -26,6 +28,7 @@ const genders = [
 ];
 
 const DetailsBox = ({ name }) => {
+  const [loading, setLoading] = useState(false);
   const mobile = useMediaQuery((theme) => theme.breakpoints.down("sm"));
   const navigate = useNavigate();
 
@@ -99,6 +102,7 @@ const DetailsBox = ({ name }) => {
   console.log(dayjs(selectedTime).format("HH"), "aksjdbfkj");
 
   const saveAndContinue = async () => {
+    setLoading(true);
     const authToken = localStorage.getItem("authToken");
     if (!authToken) return;
 
@@ -156,6 +160,7 @@ const DetailsBox = ({ name }) => {
       );
       console.log(response1);
       navigate("/verify");
+      setLoading(false);
     } catch (error) {
       console.error("Error updating details:", error);
     }
@@ -478,6 +483,45 @@ const DetailsBox = ({ name }) => {
           Save & Continue
         </Button>
       </Box>
+
+      {loading && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(83, 104, 100, 0.403)",
+            zIndex: 9999,
+            pointerEvents: "none",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Lottie
+              options={{
+                loop: true,
+                autoplay: true,
+                animationData: animationData,
+                rendererSettings: {
+                  preserveAspectRatio: "xMidYMid slice",
+                },
+              }}
+              height={150}
+              width={150}
+            />
+          </div>
+        </div>
+      )}
     </Box>
   );
 };
